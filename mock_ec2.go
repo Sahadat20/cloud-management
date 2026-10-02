@@ -36,6 +36,7 @@ func (m *MockEC2Client) LaunchInstance(ctx context.Context, instanceType, name s
 	default:
 	}
 	instanceID := m.generateInstanceID()
+	time.Sleep(3 * time.Second)
 	fmt.Printf("[MockEC2] Launched instance %s (type: %s, name: %s)\n", instanceID, instanceType, name)
 	return instanceID, nil
 }
