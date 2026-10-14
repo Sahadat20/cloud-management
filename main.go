@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 
@@ -11,11 +12,16 @@ import (
 
 func main() {
 	client := service.NewMockClient()
+
+	// start jobqueue and worker pool
+
+	workerCtx, workerCancel := context.WithCancel(context.Background())
+	defer workerCancel()
 	jobQueue := worker.NewJobQueue(100)
+	processor := worker.NewProcessor(*client)
+	workerPoll := worker.NewPool(5, jobQueue, processor.ProcessLaunch)
 
-	go worker.Worker(client, jobQueue)
-
-	// mux := http.NewServeMux()
+	workerPoll.Start(workerCtx)
 
 	router := api.NewRouter(jobQueue)
 
