@@ -19,7 +19,7 @@ func main() {
 	defer workerCancel()
 	jobQueue := worker.NewJobQueue(100)
 	processor := worker.NewProcessor(*client)
-	workerPoll := worker.NewPool(5, jobQueue, processor.ProcessLaunch)
+	workerPoll := worker.NewPool(5, jobQueue, processor.Process)
 
 	workerPoll.Start(workerCtx)
 
