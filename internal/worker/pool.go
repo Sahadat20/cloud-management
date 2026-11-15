@@ -55,7 +55,7 @@ func (p *Pool) Worker(ctx context.Context, id int) {
 			}
 			err := p.processor(ctx, job)
 			if err != nil {
-				fmt.Println("Instance lunch failed")
+				fmt.Println("Instance lunch failed: ", err)
 			}
 
 		}

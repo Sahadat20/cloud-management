@@ -26,4 +26,7 @@ func (r *Router) setupRoutes() {
 
 	r.Mux.HandleFunc("/", jobHandler.Hello)
 	r.Mux.HandleFunc("POST /instances", jobHandler.Launch)
+	r.Mux.HandleFunc("PUT /instances/{id}/start", jobHandler.Start)
+	r.Mux.HandleFunc("PUT /instances/{id}/stop", jobHandler.Stop)
+	r.Mux.HandleFunc("DELETE /instances/{id}/terminate", jobHandler.Terminate)
 }

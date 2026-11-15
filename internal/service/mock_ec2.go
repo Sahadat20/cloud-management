@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"math/rand"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 type MockEC2Client struct {
@@ -39,4 +41,34 @@ func (m *MockEC2Client) LaunchInstance(ctx context.Context, instanceType, name s
 	time.Sleep(3 * time.Second)
 	fmt.Printf("[MockEC2] Launched instance %s (type: %s, name: %s)\n", instanceID, instanceType, name)
 	return instanceID, nil
+}
+func (m *MockEC2Client) StartInstance(ctx context.Context, instanceID uuid.UUID) error {
+	select {
+	case <-ctx.Done():
+		return ctx.Err()
+	default:
+	}
+	time.Sleep(3 * time.Second)
+	fmt.Printf("[MockEC2] Started instance %s\n", instanceID)
+	return nil
+}
+func (m *MockEC2Client) StopInstance(ctx context.Context, instanceID uuid.UUID) error {
+	select {
+	case <-ctx.Done():
+		return ctx.Err()
+	default:
+	}
+	time.Sleep(3 * time.Second)
+	fmt.Printf("[MockEC2] Stoped instance %s\n", instanceID)
+	return nil
+}
+func (m *MockEC2Client) TerminateInstance(ctx context.Context, instanceID uuid.UUID) error {
+	select {
+	case <-ctx.Done():
+		return ctx.Err()
+	default:
+	}
+	time.Sleep(3 * time.Second)
+	fmt.Printf("[MockEC2] Terminated instance %s\n", instanceID)
+	return nil
 }

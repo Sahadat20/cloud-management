@@ -42,6 +42,10 @@ type LaunchPayload struct {
 	InstanceType string `json:"instance_type"`
 }
 
+type InstancePayload struct {
+	InstanceID uuid.UUID `json:"instance_id"`
+}
+
 func NewJob(jobType JobType, payload interface{}) (*Job, error) {
 	payloadBytes, err := json.Marshal(payload)
 	if err != nil {
@@ -61,6 +65,13 @@ func NewJob(jobType JobType, payload interface{}) (*Job, error) {
 
 func (j *Job) ParseLaunchPayload() (*LaunchPayload, error) {
 	var payload LaunchPayload
+	if err := json.Unmarshal(j.Payload, &payload); err != nil {
+		return nil, err
+	}
+	return &payload, nil
+}
+func (j *Job) ParseInstancePayload() (*InstancePayload, error) {
+	var payload InstancePayload
 	if err := json.Unmarshal(j.Payload, &payload); err != nil {
 		return nil, err
 	}
