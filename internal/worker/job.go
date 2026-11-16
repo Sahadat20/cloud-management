@@ -19,10 +19,10 @@ const (
 type JobStatus string
 
 const (
-	JobStatusPending   JobStatus = "pending"
-	JobStatusStart     JobStatus = "start"
-	JobStatusStop      JobStatus = "stop"
-	JobStatusTerminate JobStatus = "terminate"
+	JobStatusPending    JobStatus = "pending"
+	JobStatusProcessing JobStatus = "processing"
+	JobStatusCompleted  JobStatus = "completed"
+	JobStatusFailed     JobStatus = "failed"
 )
 
 type Job struct {
@@ -44,6 +44,11 @@ type LaunchPayload struct {
 
 type InstancePayload struct {
 	InstanceID uuid.UUID `json:"instance_id"`
+}
+type LaunchResult struct {
+	InstanceID    uuid.UUID `json:"instance_id"`
+	AWSInstanceID string    `json:"aws_instance_id"`
+	Status        string    `json:"status"`
 }
 
 func NewJob(jobType JobType, payload interface{}) (*Job, error) {
@@ -76,4 +81,24 @@ func (j *Job) ParseInstancePayload() (*InstancePayload, error) {
 		return nil, err
 	}
 	return &payload, nil
+}
+
+func (j *Job) SetResult(result any) error {
+	resultBytes, err := json.Marshal(result)
+	if err != nil {
+		return err
+	}
+	j.Result = resultBytes
+	j.Status = JobStatusCompleted
+	j.UpdatedAt = time.Now()
+	return nil
+}
+func (j *Job) SetProcessing() {
+	j.Status = JobStatusProcessing
+	j.UpdatedAt = time.Now()
+}
+func (j *Job) SetError(errMsg string) {
+	j.Error = errMsg
+	j.Status = JobStatusFailed
+	j.UpdatedAt = time.Now()
 }

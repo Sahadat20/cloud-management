@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/Sahadat20/cloud-management/internal/models"
 	"github.com/Sahadat20/cloud-management/internal/service"
 	"github.com/google/uuid"
 )
@@ -41,8 +42,13 @@ func (p *Processor) ProcessLaunch(ctx context.Context, job *Job) error {
 	if err != nil {
 		return fmt.Errorf("invalid payload: %w", err)
 	}
-	_, err = p.ec2Client.LaunchInstance(ctx, payload.InstanceType, payload.Name)
-	return err
+	awsInstanceID, err := p.ec2Client.LaunchInstance(ctx, payload.InstanceType, payload.Name)
+	result := LaunchResult{
+		InstanceID:    uuid.New(),
+		AWSInstanceID: awsInstanceID,
+		Status:        string(models.StatusPending),
+	}
+	return job.SetResult(result)
 }
 func (p *Processor) ProcessStart(ctx context.Context, job *Job) error {
 	payload, err := job.ParseInstancePayload()

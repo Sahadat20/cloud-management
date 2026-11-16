@@ -2,7 +2,6 @@ package worker
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"sync"
 )
@@ -53,10 +52,18 @@ func (p *Pool) Worker(ctx context.Context, id int) {
 				log.Printf("[Worker-%d] Stopping (channel closed)", id)
 				return
 			}
+			// process the job
+			log.Printf("[Worker-%d] Processing job %s (type: %s)", id, job.ID, job.Type)
+			job.SetProcessing()
+			p.queue.UpdateJob(job)
 			err := p.processor(ctx, job)
 			if err != nil {
-				fmt.Println("Instance lunch failed: ", err)
+				job.SetError(err.Error())
+				log.Printf("[Worker-%d] Job %s failed: %v", id, job.ID, err)
+			} else {
+				log.Printf("[Worker-%d] Job %s completed", id, job.ID)
 			}
+			p.queue.UpdateJob(job)
 
 		}
 	}
